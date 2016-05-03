@@ -59,8 +59,8 @@ class SM:
 			self.compiler.DetectAll(AMBuild)
 
 			#Detect variables
-			envvars = { 'MMSOURCE19':    'mmsource-1.9',
-			            'SOURCEMOD14':   'sourcemod-1.4',
+			envvars = { 'MMSOURCE19':    'mmsource-1.10',
+			            'SOURCEMOD14':   'sourcemod',
 			            'HL2SDKCSS':     'hl2sdk-css',
 			            'HL2SDKOBVALVE': 'hl2sdk-ob-valve',
 			            'HL2SDKL4D':     'hl2sdk-l4d',
@@ -118,22 +118,30 @@ class SM:
 
 			#Set up defines
 			cxx = self.compiler.cxx
-			if isinstance(cxx, Cpp.CompatGCC):
+			#self.compiler.cxxflags += ['-std=c++11']
+			self.compiler.AddToListVar('CXXFLAGS', '-std=c++11')
+			self.compiler.AddToListVar('CXXFLAGS', '-fpermissive')
+			self.compiler.AddToListVar('CXXFLAGS', '-rdynamic')
+			if (1==1): #isinstance(cxx, Cpp.CompatGCC):
 				if isinstance(cxx, Cpp.GCC):
 					self.vendor = 'gcc'
 				elif isinstance(cxx, Cpp.Clang):
 					self.vendor = 'clang'
 				self.compiler.AddToListVar('CDEFINES', 'stricmp=strcasecmp')
+				#self.compiler.AddToListVar('CDEFINES', 'IsX360()=false')
+				self.compiler.AddToListVar('CDEFINES', 'POSIX')
 				self.compiler.AddToListVar('CDEFINES', '_stricmp=strcasecmp')
 				self.compiler.AddToListVar('CDEFINES', '_snprintf=snprintf')
 				self.compiler.AddToListVar('CDEFINES', '_vsnprintf=vsnprintf')
+				self.compiler.AddToListVar('CDEFINES', 'GNUC')
+				self.compiler.AddToListVar('CDEFINES', 'HAVE_STDINT_H')
 				self.compiler.AddToListVar('CFLAGS', '-pipe')
 				self.compiler.AddToListVar('CFLAGS', '-fno-strict-aliasing')
 				if (self.vendor == 'gcc' and cxx.majorVersion >= 4) or self.vendor == 'clang':
 					self.compiler.AddToListVar('CFLAGS', '-fvisibility=hidden')
 					self.compiler.AddToListVar('CXXFLAGS', '-fvisibility-inlines-hidden')
 				self.compiler.AddToListVar('CFLAGS', '-Wall')
-				self.compiler.AddToListVar('CFLAGS', '-Werror')
+				#self.compiler.AddToListVar('CFLAGS', '-Werror')
 				self.compiler.AddToListVar('CFLAGS', '-Wno-uninitialized')
 				self.compiler.AddToListVar('CFLAGS', '-Wno-unused')
 				self.compiler.AddToListVar('CFLAGS', '-Wno-switch')
@@ -249,6 +257,7 @@ class SM:
 		if AMBuild.target['platform'] == 'windows':
 			self.compiler.AddToListVar('RCINCLUDES', os.path.join(AMBuild.sourceFolder, 'extension'))
 		self.mmsPath = AMBuild.cache['MMSOURCE19']
+		self.smSourcePath = AMBuild.cache['SOURCEMOD14']
 
 	def DefaultCompiler(self):
 		return self.compiler.Clone()
@@ -352,6 +361,10 @@ class SM:
 
 		compiler['CXXINCLUDES'].append(os.path.join(self.mmsPath, mms))
 		compiler['CXXINCLUDES'].append(os.path.join(self.mmsPath, mms, 'sourcehook'))
+		compiler['CXXINCLUDES'].append(os.path.join(self.smSourcePath, 'public'))
+		compiler['CXXINCLUDES'].append(os.path.join(self.smSourcePath, 'public/extensions'))
+		compiler['CXXINCLUDES'].append(os.path.join(self.smSourcePath, 'sourcepawn'))
+		compiler['CXXINCLUDES'].append(os.path.join(self.smSourcePath, 'sourcepawn/include'))
 
 		info = self.possibleSdks
 		compiler['CDEFINES'].extend(['SE_' + info[i]['name'] + '=' + info[i]['def'] for i in info])

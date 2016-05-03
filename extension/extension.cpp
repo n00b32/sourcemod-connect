@@ -20,7 +20,11 @@
 #include "extension.hpp"
 #include "CDetour/detours.h"
 
+
+
 #include "steam/steamclientpublic.h"
+
+
 
 Connect g_connect;
 

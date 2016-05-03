@@ -20,7 +20,8 @@
 
 #ifndef _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
-
+//#define IsX360() false
+#define POSIX 1
 /**
  * @file extension.hpp
  * @brief Connect extension code header.
